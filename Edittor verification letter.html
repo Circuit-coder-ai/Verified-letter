@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Techlab Rwanda | Pro Editor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <style>
+        body { background-color: #020617; font-family: 'Inter', sans-serif; color: #f8fafc; overflow: hidden; height: 100vh; }
+        .sidebar { background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%); border-right: 1px solid #334155; }
+        .glass-input, .glass-select { background: rgba(255, 255, 255, 0.05); border: 1px solid #334155; color: white; transition: 0.3s; appearance: none; outline: none; }
+        .glass-input:focus, .glass-select:focus { border-color: #38bdf8; background: rgba(56, 189, 248, 0.05); }
+        option { background: #1e293b; color: white; }
+        .letter-view { background: #cbd5e1; overflow-y: auto; display: flex; justify-content: center; align-items: flex-start; padding: 40px; flex-grow: 1; }
+        
+        .invitation-card { max-width: 800px; width: 100%; background: white; border-radius: 1rem; overflow: hidden; border: 1px solid #cbd5e1; color: #1f2937; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); }
+        .header-bg { background: linear-gradient(135deg, #0f766e 0%, #14b8a6 100%); color: white; }
+        .footer-bg { background-color: #f1f5f9; }
+
+        .p-8 { padding: 2rem; }
+        .p-10 { padding: 2.5rem; }
+        .border-t { border-top: 1px solid #e5e7eb; }
+        
+        #school-status-tag { font-size: 10px; margin-top: 4px; display: block; font-weight: bold; }
+        .verified-text { color: #10b981; }
+        .unverified-text { color: #f59e0b; }
+        
+        #qrcode img { display: inline-block; border: 4px solid white; }
+    </style>
+</head>
+<body class="flex h-screen">
+
+    <div class="sidebar w-[400px] p-8 flex flex-col animate__animated animate__fadeInLeft">
+        <div class="mb-8">
+            <h1 class="text-3xl font-black text-white italic">TECHLAB<span class="text-sky-500">GEN</span></h1>
+            <p class="text-xs text-slate-400 uppercase tracking-widest">Official Verification Editor</p>
+        </div>
+
+        <div class="space-y-5 flex-grow overflow-y-auto pr-2">
+            <div>
+                <label class="text-[10px] font-bold text-sky-400 uppercase tracking-widest">Student Name</label>
+                <input type="text" id="in-name" value="Emmelyne" oninput="sync()" class="glass-input w-full p-3 rounded-lg mt-1">
+            </div>
+
+            <div>
+                <label class="text-[10px] font-bold text-sky-400 uppercase tracking-widest">Trade Selection</label>
+                <select id="in-trade-select" onchange="handleTradeChange()" class="glass-select w-full p-3 rounded-lg mt-1 cursor-pointer">
+                    <option value="Software Development">Software Development</option>
+                    <option value="Networking">Networking</option>
+                    <option value="Computer system and Architecture">Computer system and Architecture</option>
+                    <option value="Eletronics and eletrical Technology">Eletronics and eletrical Technology</option>
+                    <option value="Other">-- Custom Trade --</option>
+                </select>
+                <input type="text" id="in-trade-custom" placeholder="Type custom trade..." oninput="sync()" class="glass-input w-full p-3 rounded-lg mt-2 hidden">
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="text-[10px] font-bold text-sky-400 uppercase tracking-widest">School</label>
+                    <input type="text" id="in-school" value="ETS" oninput="sync()" class="glass-input w-full p-3 rounded-lg mt-1" placeholder="e.g. IPRC, ETS...">
+                    <span id="school-status-tag">Checking...</span>
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-sky-400 uppercase tracking-widest">Level</label>
+                    <input type="text" id="in-level" value="L5" oninput="sync()" class="glass-input w-full p-3 rounded-lg mt-1">
+                </div>
+            </div>
+
+            <div>
+                <label class="text-[10px] font-bold text-sky-400 uppercase tracking-widest">Do you have laptop for internship?</label>
+                <select id="in-laptop" onchange="sync()" class="glass-select w-full p-3 rounded-lg mt-1 cursor-pointer">
+                    <option value="Yes">Yes</option>
+                    <option value="No">No</option>
+                    <option value="I will find it!">I will find it!</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="text-[10px] font-bold text-sky-400 uppercase tracking-widest">Verification Date</label>
+                <input type="date" id="in-date" onchange="sync()" class="glass-input w-full p-3 rounded-lg mt-1">
+            </div>
+        </div>
+
+        <button onclick="exportLetter()" class="mt-8 bg-sky-600 hover:bg-sky-500 text-white font-bold py-4 rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 active:scale-95">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            <span>EXPORT AS HTML</span>
+        </button>
+    </div>
+
+    <div class="letter-view">
+        <div id="capture-area">
+            <div class="invitation-card">
+                <div class="header-bg p-8 text-center" style="padding: 2rem; text-align: center;">
+                    <h1 style="font-size: 3rem; font-weight: 800; margin: 0; color: white;">Techlab Rwanda</h1>
+                    <p style="font-size: 1.25rem; opacity: 0.9; margin: 8px 0 0 0; color: white;">Official Verification Letter</p>
+                </div>
+                <div class="p-10" style="padding: 2.5rem;">
+                    <h2 style="font-size: 1.5rem; font-weight: 700; color: #111827; border-bottom: 2px solid #14b8a6; padding-bottom: 8px; margin-bottom: 24px; font-family: sans-serif;">
+                        Verification for Internship of Second term Application
+                    </h2>
+                    
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 32px;">
+                        <div style="font-size: 1.125rem; line-height: 1.75; flex-grow: 1;">
+                            <p style="margin: 8px 0;"><span style="color: #0d9488; font-weight: 600;">Student Name:</span> <span id="out-name" style="color: #1e40af; font-weight: 800;">Emmelyne</span></p>
+                            <p style="margin: 8px 0;"><span style="color: #0d9488; font-weight: 600;">School:</span> <span id="out-school">ETS</span> <span id="out-verify-badge" style="font-size: 0.75rem; vertical-align: middle; margin-left: 8px;"></span></p>
+                            <p style="margin: 8px 0;"><span style="color: #0d9488; font-weight: 600;">Trade:</span> <span id="out-trade" style="color: #ef4444; font-weight: 500;">Software Development</span></p>
+                            <p style="margin: 8px 0;"><span style="color: #0d9488; font-weight: 600;">Level:</span> <span id="out-level" style="color: #ef4444; font-weight: 500;">L5</span></p>
+                            <p style="margin: 8px 0;"><span style="color: #0d9488; font-weight: 600;">Laptop for Internship:</span> <span id="out-laptop" style="color: #1e40af; font-weight: 600;">Yes</span></p>
+                        </div>
+                        <div id="qrcode" style="margin-left: 20px;"></div>
+                    </div>
+
+                    <p style="color: #374151; line-height: 1.625; margin-bottom: 24px;">
+                        Thank you for taking seatsplace in Techlab Rwanda in Internship Program. We are pleased to confirm that your seatsplace has been successfully Taken and your student status has been verified. This completes the initial application step.
+                    </p>
+                    <div style="font-size: 0.875rem; color: #6b7280; border-top: 1px solid #e5e7eb; padding-top: 16px; margin-top: 24px;">
+                        <p style="font-weight: 700; color: #374151; margin-bottom: 4px;">Verification Note:</p>
+                        <p style="margin: 0;">Every student is required to arrive after close of Second term at April 3, 2026 on time and present this verified letter.A student is requested to bring this verification letter to be accepted for other items.</p>
+                    </div>
+                </div>
+                <div class="footer-bg p-8 border-t" style="background-color: #f1f5f9; padding: 2rem; border-top: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <p style="font-weight: 700; color: #111827; margin: 0;">Verified by,</p>
+                        <p style="color: #0d9488; font-weight: 700; font-size: 1.125rem; margin: 0;">Techlab Rwanda</p>
+                    </div>
+                    <div style="text-align: right; font-size: 0.875rem; color: #4b5563;">
+                        <p style="margin: 0;">Email: techlabrwanda@gmail.com</p>
+                        <p style="margin: 0;">Contact: (+250) 794934827</p>
+                        <p id="out-date" style="margin: 0;">Verified date: Jan 7, 2026]</p>
+                        <p style="margin: 0;">Kigali, Nyarugenge</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const tvetSchools = ["ETS", "TSS", "TVET", "KIGALI IPRC", "IPRC KIGALI", "IPRC WEST", "IPRC SOUTH", "IPRC EAST", "IPRC NORTH", "IPRC MUSANZE", "IPRC NGOMA", "IPRC KARONGI", "IPRC TUMBA", "KAVUMU", "NYANZA", "GISHARI", "MPANDA", "GACUTAMOZI", "ST JOSEPH", "DON BOSCO", "Nyamirambo", "EFOTEC", "Polytechnic", "Mururu", "Gikondo", "Mabanza", "Muhanga", "Rwabuye", "Nemba"];
+
+        let qrcode = new QRCode(document.getElementById("qrcode"), {
+            width: 100, height: 100, colorDark : "#000000", colorLight : "#ffffff", correctLevel : QRCode.CorrectLevel.H
+        });
+
+        function handleTradeChange() {
+            const select = document.getElementById('in-trade-select');
+            const custom = document.getElementById('in-trade-custom');
+            if (select.value === "Other") custom.classList.remove('hidden');
+            else custom.classList.add('hidden');
+            sync();
+        }
+
+        function sync() {
+            const name = document.getElementById('in-name').value;
+            const schoolVal = document.getElementById('in-school').value;
+            const level = document.getElementById('in-level').value;
+            const laptopVal = document.getElementById('in-laptop').value;
+            const select = document.getElementById('in-trade-select');
+            const custom = document.getElementById('in-trade-custom');
+            const trade = select.value === "Other" ? custom.value : select.value;
+            const rawDate = document.getElementById('in-date').value;
+            const dateStr = rawDate ? new Date(rawDate).toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'}) : "Jan 7, 2026";
+            
+            const isVerified = tvetSchools.some(school => schoolVal.toUpperCase().includes(school.toUpperCase()));
+            const statusTag = document.getElementById('school-status-tag');
+            const outVerifyBadge = document.getElementById('out-verify-badge');
+
+            if(isVerified) {
+                statusTag.innerText = "✅ VERIFIED TVET/TSS SCHOOL";
+                statusTag.className = "verified-text";
+                outVerifyBadge.innerHTML = "<span style='color: #10b981; border: 1px solid #10b981; padding: 2px 6px; border-radius: 4px; font-weight: bold;'>VERIFIED TVET/TSS</span>";
+            } else {
+                statusTag.innerText = "⚠️ PRIVATE/OTHER SCHOOL";
+                statusTag.className = "unverified-text";
+                outVerifyBadge.innerHTML = "<span style='color: #f59e0b; border: 1px solid #f59e0b; padding: 2px 6px; border-radius: 4px; font-weight: bold;'>OTHER</span>";
+            }
+
+            document.getElementById('out-name').innerText = name;
+            document.getElementById('out-school').innerText = schoolVal;
+            document.getElementById('out-trade').innerText = trade || "Select Trade";
+            document.getElementById('out-level').innerText = level;
+            document.getElementById('out-laptop').innerText = laptopVal;
+            document.getElementById('out-date').innerText = "Verified date: " + dateStr + "]";
+
+            const qrData = `TECHLAB VERIFICATION\nStudent: ${name}\nSchool: ${schoolVal}\nTrade: ${trade}\nLevel: ${level}\nLaptop: ${laptopVal}\nDate: ${dateStr}`;
+            qrcode.makeCode(qrData);
+        }
+
+        window.onload = sync;
+
+        function exportLetter() {
+            const letterHtml = document.getElementById('capture-area').innerHTML;
+            const student = document.getElementById('in-name').value || "Student";
+            const finalCode = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Verification - ${student}</title><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet"><style>body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; display: flex; justify-content: center; padding: 50px 20px; margin: 0; } .invitation-card { max-width: 800px; width: 100%; background: white; border-radius: 1rem; overflow: hidden; border: 1px solid #cbd5e1; box-shadow: 0 10px 15px rgba(0,0,0,0.1); } .header-bg { background: linear-gradient(135deg, #0f766e 0%, #14b8a6 100%); color: white; } #qrcode img { display: inline-block; border: 4px solid white; width: 100px; height: 100px; }</style></head><body><div style="width: 100%; display: flex; justify-content: center;">${letterHtml}</div></body></html>`;
+            const blob = new Blob([finalCode], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = "Verification_" + student.replace(/\s+/g, '_') + ".html";
+            document.body.appendChild(link); link.click(); document.body.removeChild(link);
+        }
+    </script>
+</body>
+</html>
